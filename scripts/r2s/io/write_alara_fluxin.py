@@ -13,7 +13,7 @@ from r2s.scdmesh import ScdMesh
 
 
 def get_flux_tag_handles(mesh):
-    """Method identifies all tags containing flux information from a meshtally
+    """Method identifies all tags containing flux information from a mesh tally
 
     Parameters
     ----------
@@ -86,7 +86,7 @@ def find_num_e_groups(sm):
     return num_e_groups
 
 
-def print_fluxes(mesh, num_e_groups, backward_bool, fluxin_name, tags=None):
+def print_fluxes(mesh, num_e_groups, high_to_low_bool, fluxin_name, tags=None):
     """Method writes tag values to ALARA fluxin format for the flux at each
     energy for each voxel
 
@@ -96,7 +96,7 @@ def print_fluxes(mesh, num_e_groups, backward_bool, fluxin_name, tags=None):
         MOAB mesh file object containing tags of the form TALLY_TAG_lowE-highE
     num_e_groups : integer
         Number of energy groups in tally
-    backward_bool : boolean
+    high_to_low_bool : boolean
         If true, output data is in order from high energy to low energy.
         Note that this should be true when working with the FENDL libraries.
     fluxin_name : string
@@ -122,7 +122,7 @@ def print_fluxes(mesh, num_e_groups, backward_bool, fluxin_name, tags=None):
             
             #Establish for loop bounds based on if forward or backward printing
             #is requested
-            if backward_bool == False:
+            if high_to_low_bool == False:
                 min = 0
                 max = num_e_groups
                 direction = 1
@@ -161,7 +161,7 @@ def print_fluxes(mesh, num_e_groups, backward_bool, fluxin_name, tags=None):
     output.close()
 
 
-def write_alara_fluxin(filename, mesh, backwards=False):
+def write_alara_fluxin(filename, mesh, high_to_low_bool):
     """Load a MOAB mesh and create an alara_fluxin file from tags
     
     Parameters
@@ -170,7 +170,7 @@ def write_alara_fluxin(filename, mesh, backwards=False):
         Output filename for the fluxin file.
     mesh - ScdMesh or iMesh.Mesh object
         MOAB mesh with tags to create fluxin file from.
-    backwards - boolean
+    high_to_low_bool- boolean
         If true, prints fluxes from high energy to low energy. 
         Note that this should be true when working with the FENDL libraries.
     """
@@ -184,7 +184,7 @@ def write_alara_fluxin(filename, mesh, backwards=False):
         num_e_groups = len(fluxtaghandles)
 
     # Print flux.in file
-    print_fluxes(mesh, num_e_groups, backwards, filename, tags=fluxtaghandles)
+    print_fluxes(mesh, num_e_groups, high_to_low_bool, filename, tags=fluxtaghandles)
 
 
 def main():
@@ -193,9 +193,9 @@ def main():
     parser = OptionParser\
              (usage='%prog <structured mesh> [options]')
 
-    parser.add_option('-b', action='store_true', dest='backward_bool',\
+    parser.add_option('-b', action='store_true', dest='high_to_low_bool',\
         default=False, \
-        help='Print to ALARA fluxin in fluxes in  decreasing energy. ' \
+        help='If true, print to ALARA fluxin in fluxes in decreasing energy. ' \
         'Default=%default')
 
     parser.add_option('-o', dest='fluxin_name', default='ALARAflux.in',\
@@ -210,7 +210,7 @@ def main():
     # Load Structured mesh from file
     sm = ScdMesh.fromFile(args[1])
 
-    write_alara_fluxin( opts.fluxin_name, sm, opts.backward_bool )
+    write_alara_fluxin( opts.fluxin_name, sm, opts.high_to_low_bool )
 
 
 if __name__ == '__main__':

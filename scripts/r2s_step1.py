@@ -104,6 +104,7 @@ def load_config_params(config):
     param_guide = [ #parameter  #default #get function
             [ 'gen_mmgrid',     True,  config.getboolean],
             [ 'mmgrid_rays',    10,    config.getint],
+            [ 'high_to_low_bool', True, config.getboolean],
             [ 'step2setup',     False, config.getboolean],
             [ 'structuredmesh', True,  config.getboolean]
             ]
@@ -269,7 +270,7 @@ def gen_alara_main_input(mesh, alara_geom, config, alara_snippet=None):
                 f.write(snip.read())
 
 
-def gen_alara_fluxin(mesh, fluxin):
+def gen_alara_fluxin(mesh, fluxin, high_to_low_bool):
     """Create the ALARA fluxin file
     
     Parameters
@@ -280,7 +281,7 @@ def gen_alara_fluxin(mesh, fluxin):
         Filename/path for ALARA fluxin file.
     """
     print "Writing alara fluxin file `{0}'".format(fluxin)
-    write_alara_fluxin(fluxin, mesh, backwards=True)
+    write_alara_fluxin(fluxin, mesh, high_to_low_bool)
 
 
 if __name__ == "__main__":
@@ -295,9 +296,10 @@ if __name__ == "__main__":
     try:
         # Read config file
         (meshtal_file, mcnp_geom, alara_snippet, visfile, datafile, \
-            fluxin, alara_geom, alara_matdict) = load_config_files(config)
+            fluxin, alara_geom, alara_matdict)\
+             = load_config_files(config)
 
-        (gen_mmgrid, mmgrid_rays, opt_step2setup, isscd) = \
+        (gen_mmgrid, mmgrid_rays, high_to_low_bool, opt_step2setup, isscd) = \
                 load_config_params(config)
 
         # Do step 1
@@ -310,7 +312,7 @@ if __name__ == "__main__":
 
         gen_alara_main_input(mesh, alara_geom, config, alara_snippet)
 
-        gen_alara_fluxin(mesh, fluxin)
+        gen_alara_fluxin(mesh, fluxin, high_to_low_bool)
 
     except R2S_CFG_Error as e:
         print "ERROR: {0}\n(in r2s.cfg file {1})".format( e, \

@@ -148,6 +148,13 @@ mmgrid_rays = 10
 #  parameter to False to avoid re-running the ray tracing.
 gen_mmgrid = True
 
+# Boolean varible to determine the order in which ALARA fluxin entries are 
+# printed. "True" means entries will be printed from high energy to low energy,
+# and should be used when using FENDL2 data for the transmutation portion of the
+# ALARA calculation. "False" should be used when the CINDER data library is used
+# for the transmuation portion of the ALARA calculation.
+high_to_low_bool = True
+
 # If step2setup is True, runs the r2s_step2setup.py script at the end of 
 #  r2s_step1.py.  r2s_step2setup.py creates folders for all cooling steps
 #  and isotopes specified
